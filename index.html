@@ -111,7 +111,6 @@
 
     const calendarGrid = document.getElementById("calendarGrid");
     const restEditor = document.getElementById("restDayEditor");
-    const completed = JSON.parse(localStorage.getItem("day-completed") || "{}");
     const restDays = JSON.parse(localStorage.getItem("rest-days") || "[]");
 
     const totalDays = todayNum + 30; // show 30 days beyond today
@@ -119,8 +118,9 @@
     for (let i = 1; i <= totalDays; i++) {
       const cell = document.createElement("div");
       cell.className = "calendar-cell";
+      const completed = localStorage.getItem(`completed-${i}`);
       if (i === todayNum) cell.classList.add("today");
-      if (completed[i]) cell.classList.add("completed");
+      if (completed) cell.classList.add("completed");
       cell.textContent = i;
       cell.onclick = () => window.location.href = `day.html?day=${i}`;
       calendarGrid.appendChild(cell);
