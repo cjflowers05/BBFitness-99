@@ -66,6 +66,7 @@
     <button class="btn" onclick="window.location.href='index.html'">Back to Home</button>
   </div>
 
+  <!-- ✅ JavaScript placed at the bottom of <body> -->
   <script>
     const urlParams = new URLSearchParams(window.location.search);
     const day = parseInt(urlParams.get("day")) || 1;
@@ -74,9 +75,9 @@
     const exercisesKey = `exercises-${day}`;
     const notesKey = `notes-${day}`;
     const completedKey = `completed-${day}`;
-    let exercises = JSON.parse(localStorage.getItem(exercisesKey) || "[]");
 
     const notesField = document.getElementById("notes");
+    let exercises = JSON.parse(localStorage.getItem(exercisesKey) || "[]");
 
     const strengthExercises = [
       "Push-ups - 4x10", "Pull-ups - 4x10", "Deadlifts - 4x8", "Dumbbell Press - 4x10",
@@ -126,7 +127,9 @@
       exercises[i].done = !exercises[i].done;
       if (exercises[i].done) {
         const line = `✅ Completed: ${exercises[i].name}\n`;
-        notesField.value += (notesField.value.includes(line) ? "" : line);
+        if (!notesField.value.includes(line)) {
+          notesField.value += line;
+        }
       }
       render();
     }
