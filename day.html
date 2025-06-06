@@ -122,4 +122,49 @@
       });
     }
 
-    function toggle(
+    function toggle(i) {
+      exercises[i].done = !exercises[i].done;
+      if (exercises[i].done) {
+        const line = `✅ Completed: ${exercises[i].name}\n`;
+        notesField.value += (notesField.value.includes(line) ? "" : line);
+      }
+      render();
+    }
+
+    function addExercise() {
+      const input = document.getElementById("newExercise");
+      if (input.value.trim()) {
+        exercises.push({ name: input.value.trim(), done: false });
+        input.value = "";
+        render();
+      }
+    }
+
+    function saveDay() {
+      localStorage.setItem(exercisesKey, JSON.stringify(exercises));
+      localStorage.setItem(notesKey, notesField.value);
+      localStorage.setItem(completedKey, "true");
+      alert("Workout saved!");
+    }
+
+    notesField.value = localStorage.getItem(notesKey) || "";
+    render();
+
+    let seconds = 0, interval;
+    function updateTimer() {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById("timer").textContent = `${m}:${s}`;
+    }
+    function startTimer() {
+      if (!interval) interval = setInterval(() => { seconds++; updateTimer(); }, 1000);
+    }
+    function pauseTimer() {
+      clearInterval(interval); interval = null;
+    }
+    function resetTimer() {
+      pauseTimer(); seconds = 0; updateTimer();
+    }
+  </script>
+</body>
+</html>
