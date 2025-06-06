@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Workout Day</title>
+  <style>
+    body {
+      background-color: #121212;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      margin: 0;
+      padding: 1rem;
+    }
+    .btn {
+      background-color: #ff3c3c;
+      color: white;
+      padding: 0.5rem 1rem;
+      margin: 0.5rem 0.25rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .exercise-list {
+      margin-top: 1rem;
+    }
+    .exercise-item {
+      margin-bottom: 0.5rem;
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      background: #1f1f1f;
+      color: white;
+      border: 1px solid #444;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 8px;
+    }
+    .timer {
+      font-size: 2rem;
+      text-align: center;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="dayHeader">Workout Day</h1>
+  <div>
+    <input id="newExercise" placeholder="Add exercise" />
+    <button class="btn" onclick="addExercise()">Add</button>
+    <button class="btn" onclick="suggestWorkout()">Suggest Workout</button>
+    <button class="btn" onclick="suggestCardio()">Suggest Cardio Workout</button>
+  </div>
+  <div id="exerciseList" class="exercise-list"></div>
+
+  <textarea id="notes" placeholder="Notes..."></textarea>
+
+  <div class="timer" id="timer">00:00</div>
+  <button class="btn" onclick="startTimer()">Start</button>
+  <button class="btn" onclick="pauseTimer()">Pause</button>
+  <button class="btn" onclick="resetTimer()">Reset</button>
+
+  <div>
+    <button class="btn" onclick="saveDay()">Save</button>
+    <button class="btn" onclick="window.location.href='index.html'">Back to Home</button>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const day = parseInt(urlParams.get("day")) || 1;
+    document.getElementById("dayHeader").textContent = `Workout Day ${day}`;
+
+    const exercisesKey = `exercises-${day}`;
+    const notesKey = `notes-${day}`;
+    const completedKey = `completed-${day}`;
+    let exercises = JSON.parse(localStorage.getItem(exercisesKey) || "[]");
+
+    function render() {
+      const list = document.getElementById("exerciseList");
+      list.innerHTML = "";
+      exercises.forEach((e, i) => {
+        const div = document.createElement("div");
+        div.className = "exercise-item";
+        div.innerHTML = `<label><input type='checkbox' ${e.done ? "checked" : ""} onchange='toggle(${i})'> ${e.name}</label>`;
+        list.appendChild(div);
+      });
+    }
+
+    function toggle(i) {
+      exercises[i].done = !exercises[i].done;
+      render();
+    }
+
+    function addExercise() {
+      const input = document.getElementById("newExercise");
+      if (input.value.trim()) {
+        exercises.push({ name: input.value.trim(), done: false });
+        input.value = "";
+        render();
+      }
+    }
+
+    function suggestWorkout() {
+      exercises = [
+        { name: "Push-ups - 4x15", done: false },
+        { name: "Pull-ups - 4x10", done: false },
+        { name: "Deadlifts - 4x8", done: false },
+        { name: "Dumbbell Press - 4x10", done: false }
+      ];
+      render();
+    }
+
+    function suggestCardio() {
+      exercises = [
+        { name: "Burpees - 3x20", done: false },
+        { name: "Mountain Climbers - 3x30 sec", done: false },
+        { name: "Stationary Bike - 30 min", done: false },
+        { name: "Ruck March - 45 min", done: false }
+      ];
+      render();
+    }
+
+    function saveDay() {
+      localStorage.setItem(exercisesKey, JSON.stringify(exercises));
+      localStorage.setItem(notesKey, document.getElementById("notes").value);
+      localStorage.setItem(completedKey, "true");
+      alert("Workout saved!");
+    }
+
+    document.getElementById("notes").value = localStorage.getItem(notesKey) || "";
+    render();
+
+    let seconds = 0, interval;
+    function updateTimer() {
+      const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const s = String(seconds % 60).padStart(2, '0');
+      document.getElementById("timer").textContent = `${m}:${s}`;
+    }
+    function startTimer() {
+      if (!interval) interval = setInterval(() => { seconds++; updateTimer(); }, 1000);
+    }
+    function pauseTimer() {
+      clearInterval(interval); interval = null;
+    }
+    function resetTimer() {
+      pauseTimer(); seconds = 0; updateTimer();
+    }
+  </script>
+</body>
+</html>
